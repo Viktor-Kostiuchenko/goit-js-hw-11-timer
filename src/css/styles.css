@@ -1,14 +1,36 @@
+body {
+  text-align: center;
+  padding: 100px 60px;
+  background: #70e1f5;
+  font-family: sans-serif;
+  font-weight: lighter;
+}
+
 .timer {
-  display: flex;
-  justify-content: center;
-  padding: 100px;
-  font-size: 25px;
+  margin: 0 auto;
+  width: 750px;
+  font-size: 3em;
+  font-weight: 100;
+  color: white;
+  padding: 20px;
+  width: 700px;
+  color: white;
 }
 
 .field {
+  display: inline-block;
+  min-width: 90px;
   padding: 15px;
-  display: flex;
-  border: 1px solid red;
-  flex-direction: column;
-  align-items: center;
+  background: #020b43;
+  border-radius: 15px;
+  border: 2px solid #030d52;
+  margin: 15px;
+}
+
+.label {
+  color: #ffffff;
+  display: block;
+  margin-top: 15px;
+  font-size: 0.35em;
+  font-weight: 400;
 }
