@@ -14,10 +14,15 @@ export class CountdownTimer {
       const currentTime = Date.now()
       const deltaTime = this.targetDate - currentTime
       const countDown = this.getTimeComponents(deltaTime)
+
       this.updateClockFace(countDown)
+
+      if (deltaTime < 0) {
+        this.clearInterval()
+      }
     }, 1000)
   }
-
+  
   clearInterval() {
     clearInterval(this.selector)
     this.updateClockFace({days: '00', hours: '00', mins: '00', secs: '00'})
