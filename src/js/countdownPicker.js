@@ -1,54 +1,65 @@
-import { CountdownTimer } from './timer'
-import { refs } from './refs'
+import { CountdownTimer } from './countdownTimer'
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
+class CountdownPicker extends CountdownTimer {
+  constructor({ selector, targetDate, options }) {
+    super({ selector, targetDate })
+    this.dataEl = document.getElementById('datetime-picker')
+    this.startBtnEl = document.querySelector('[data-start]')
+    this.clearBtnEl = document.querySelector('[data-clear]')
+    this.options = options
+  }
+   
+  disableElements(...args) {
+    args.forEach(el => el.setAttribute('disabled', 'disabled'))
+  }
 
-const { dataEl, startBtnEl, clearBtnEl, flatpickrEl } = refs
+  enableElements(...args) {
+    args.forEach(el => el.removeAttribute('disabled', 'disabled'))
+  }
+  
+  dataset() {
+    flatpickr(this.dataEl, this.options)
+  }
 
-const timer = new CountdownTimer({
-  selector: '#timer-1',
-});
+  startTimer() {
+    super.startInterval()
+    this.enableElements(this.clearBtnEl)
+    this.disableElements(this.startBtnEl, document.querySelector('.flatpickr-mobile') )
+  }
 
-const options = {
-  enableTime: true,
-  time_24hr: true,
-  defaultDate: Date.now(),
-  minuteIncrement: 1,
-  onClose(selectedDates) {
-    if (selectedDates[0] < Date.now()) {
-      startBtnEl.setAttribute('disabled', 'disabled')
-      Notify.failure('Please choose a date in the future');
-    } else {
-      startBtnEl.removeAttribute('disabled')
-      timer.date = selectedDates[0]
-    }
-    clearBtnEl.setAttribute('disabled', 'disabled')
+  stopTimer() {
+    super.clearInterval()
+    this.enableElements(this.startBtnEl, document.querySelector('.flatpickr-mobile') )
+    this.disableElements(this.clearBtnEl)
+  }
+  
+  activateTimer() {
+    this.startBtnEl.addEventListener('click', () => this.startTimer())
+    this.clearBtnEl.addEventListener('click', () => this.stopTimer())
+    this.dataset()
   }
 }
-    
-flatpickr(dataEl, options)
+const timer = new CountdownPicker({
+  selector: '#timer-1',
+  options: {
+      enableTime: true,
+      time_24hr: true,
+      defaultDate: Date.now(),
+      minuteIncrement: 1,
+      onClose(selectedDates) {
+    if (selectedDates[0] < Date.now()) {
+      timer.startBtnEl.setAttribute('disabled', 'disabled')
+      Notify.failure('Please choose a date in the future');
+    } else {
+      timer.startBtnEl.removeAttribute('disabled')
+      timer.date = selectedDates[0]
+    }
+    timer.clearBtnEl.setAttribute('disabled', 'disabled')
+  }
+  }
+})
 
-function startTimer() {
-  timer.startInterval()
-  disableElement(startBtnEl)
-  enableElement(clearBtnEl)
-}
-
-function stopTimer() {
-  timer.clearInterval()
-  enableElement(startBtnEl)
-  disableElement(clearBtnEl)
-}
-
-function disableElement(el) {
-  el.setAttribute('disabled', 'disabled')
-}
-
-function enableElement(el) {
-  el.removeAttribute('disabled')
-}
-
-startBtnEl.addEventListener('click', startTimer)
-clearBtnEl.addEventListener('click', stopTimer)
+timer.activateTimer()
